@@ -1,5 +1,4 @@
-import { Transform } from "class-transformer";
-import { IsEmail, IsString } from "class-validator";
+import { IsEmail, IsEnum, IsString } from "class-validator";
 import { User } from "../entity";
 
 export class CreateUserDto implements Pick<Required<User>, 'email' | 'password'> {
@@ -8,4 +7,7 @@ export class CreateUserDto implements Pick<Required<User>, 'email' | 'password'>
 
     @IsString()
     password!: string;
+
+    @IsEnum(User.getRoles())
+    role!: ReturnType<(typeof User)['getRoles']>[number];
 }

@@ -1,7 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn, BaseEntity } from "typeorm";
 
 @Entity()
-export class User {
+export class User extends BaseEntity {
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -10,4 +10,11 @@ export class User {
 
     @Column("text")
     password!: string;
+
+    @Column({enum: User.getRoles(), type: "text"})
+    role!: ReturnType<(typeof User)['getRoles']>[number];
+
+    public static getRoles() {
+        return ['admin', 'external_user'] as const;
+    }
 }

@@ -1,7 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
 
+// TODO createdAt, fullName
 @Entity()
-export class Order {
+export class Order extends BaseEntity  {
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -13,6 +14,22 @@ export class Order {
 
     @Column("int")
     area!: number;
+
+    @Column("int")
+    userId!: number;
+
+    @Column({type: "text"})
+    fullName!: string;
+
+    // @Column('timestamp', {
+    //     default: () => 'CURRENT_TIMESTAMP',
+    //     transformer: {
+    //         from: (d) => d.getTime(),
+    //         to: (t) => new Date(t)
+    //     }
+    // })
+    @CreateDateColumn()
+    public createdAt!: Date;
 
     public static getBuildType() {
         return ['flat', 'house'] as const;
