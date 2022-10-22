@@ -3,8 +3,7 @@ version: '3.4'
 
 services:
   server:
-        build:
-            context: .
+        image: khalitovadel/kuc:lts
         volumes:
           - ${PWD}/db:/app/db
         ports:
