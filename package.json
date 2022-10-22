@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "webpack --config webpack.config.server.js",
+    "build": "tsc --build ./tsconfig.build.json ",
     "serve": "nodemon server/app.ts",
-    "start": "node ./dist/server.js",
+    "start": "node ./dist/app.js",
     "prebuild": "rimraf ./dist"
   },
   "author": "",
