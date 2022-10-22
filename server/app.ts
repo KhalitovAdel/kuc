@@ -12,11 +12,7 @@ import { Database, Resource } from '@adminjs/typeorm';
 import { OrderService, UserService } from "./service";
 import { CustomResource, OrderResourceHandler, UserResourceHandler } from "./resource";
 import { I18nUtil, OrderI18n, UserI18n } from "./i18n";
-import { promises } from 'fs';
-import { join } from 'path';
-import { HtmlEditor, HtmlToPdf } from "./util";
-import { OrderToHtml } from "./adapter";
-import { PrintOrderCase } from "./useCase";
+import { OrderPdfTemplate } from "./template";
 
 AdminJs.registerAdapter({ Database, Resource });
 /**
@@ -28,14 +24,11 @@ createDatabase(Object.values(entities)).then(async (ds) => {
     User.useDataSource(ds);
     Order.useDataSource(ds);
 
-    const htmlEditor = new HtmlEditor<OrderToHtml>(await promises.readFile(join(__dirname, 'template.html'), { encoding: 'utf8' }));
-    const htmlConverter = new HtmlToPdf({ format: 'A4' });
     const orderRepository = ds.getRepository(Order);
 
     const orderService = new OrderService(orderRepository);
     const userService = new UserService(ds.getRepository(User));
 
-    const printOrderCase = new PrintOrderCase(orderRepository, htmlEditor, htmlConverter);
 
     const userResource = new CustomResource(User, new UserResourceHandler(userService));
     const orderResource = new CustomResource(Order, new OrderResourceHandler(orderService));
@@ -80,7 +73,11 @@ createDatabase(Object.values(entities)).then(async (ds) => {
 
     app.get('/orderPrint/:id', async (req, res, next) => {
         try {
-            return res.status(200).send(await printOrderCase.exec(+req.params.id))
+            res.setHeader("content-type", "application/pdf");
+            const entity = await orderService.get(+req.params.id);
+            const d = await new OrderPdfTemplate(entity).convert();
+            d.pipe(res);
+            d.end();
         } catch (e) {
             next(e);
         }

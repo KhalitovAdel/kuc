@@ -1,9 +1,7 @@
 import { Repository } from 'typeorm';
-import { OrderToHtml } from '../adapter';
 import { CreateOrderDto, UpdateOrderDto } from '../dto';
 import { Order } from '../entity';
 import { NotNullException } from '../exception';
-import { HtmlEditor, HtmlToPdf } from '../util';
 
 export class OrderService {
     constructor(
@@ -22,6 +20,13 @@ export class OrderService {
             : exists.price;
 
         return Object.assign(exists, {...v, price }).save();
+    }
+
+    public async get(orderId: number): Promise<Order> {
+        const entity = await this.repository.findOne({ where: { id: orderId }});
+        if (!entity) throw new NotNullException(Order.name);
+
+        return entity;
     }
 
     private getPrice(area: Order['area'], type: Order['buildType']): number {
