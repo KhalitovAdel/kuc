@@ -4,7 +4,7 @@ import { join } from 'path';
 export async function createDatabase(entities: MixedList<Function | string | EntitySchema>) {
     const AppDataSource = new DataSource({
         type: 'sqlite',
-        database: "kuc",
+        database: "db/kuc.fileStorage",
         entities,
         synchronize: false,
         logging: false,
