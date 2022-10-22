@@ -1,22 +1,23 @@
-import { create, CreateOptions } from 'html-pdf';
+import { generatePdf, Options } from 'html-pdf-node';
 
 export class HtmlToPdf {
-    private readonly options?: CreateOptions
+    private readonly options: Options;
 
-    constructor(options?: CreateOptions) {
+    constructor(options?: Options) {
         this.options = {
             format: 'A4',
-            zoomFactor: '1',
+            width: 600,
+            height: 800,
+            scale: 1.5,
             ...(options || {})
         }
     }
 
     public async convert(html: string): Promise<Buffer> {
         return new Promise((res, rej) => {
-            create(html, this.options).toBuffer((err, buffer) => {
+            generatePdf({ content: html }, this.options, (err, b) => {
                 if (err) return rej(err);
-
-                return res(buffer);
+                return res(b);
             })
         })
     }

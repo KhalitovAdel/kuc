@@ -29,7 +29,7 @@ createDatabase(Object.values(entities)).then(async (ds) => {
     Order.useDataSource(ds);
 
     const htmlEditor = new HtmlEditor<OrderToHtml>(await promises.readFile(join(__dirname, 'template.html'), { encoding: 'utf8' }));
-    const htmlConverter = new HtmlToPdf({ format: 'A3' });
+    const htmlConverter = new HtmlToPdf({ format: 'A4' });
     const orderRepository = ds.getRepository(Order);
 
     const orderService = new OrderService(orderRepository);
