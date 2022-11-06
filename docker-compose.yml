@@ -3,8 +3,62 @@ version: '3.4'
 
 services:
   server:
-        image: khalitovadel/kuc:lts
-        volumes:
-          - ${PWD}/db:/app/db
-        ports:
-        - 80:4050
+    image: khalitovadel/kuc:lts
+    volumes:
+      - ${PWD}/db:/app/db
+    expose:
+      - 4050
+    environment:
+      - VIRTUAL_PORT=4050
+      - VIRTUAL_HOST=abbcertificate.kzn-tehnadzor.ru
+      - LETSENCRYPT_HOST=abbcertificate.kzn-tehnadzor.ru
+    depends_on:
+      - letsencrypt
+    networks:
+      - domain
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    environment:
+      - ENABLE_IPV6=true
+      - DEFAULT_HOST=abbcertificate.kzn-tehnadzor.ru
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - conf:/etc/nginx/conf.d
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - dhparam:/etc/nginx/dhparam
+      - certs:/etc/nginx/certs:ro
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    restart: always
+    networks:
+      - domain
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    depends_on:
+      - nginx-proxy
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - certs:/etc/nginx/certs:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: always
+    networks:
+      - domain
+
+volumes:
+  docker:
+  code-server:
+  conf:
+  vhost:
+  html:
+  dhparam:
+  certs:
+  dcerts:
+
+networks:
+  domain:
